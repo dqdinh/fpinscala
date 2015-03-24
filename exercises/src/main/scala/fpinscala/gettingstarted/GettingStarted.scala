@@ -36,7 +36,14 @@ object MyModule {
 
   // Exercise 1: Write a function to compute the nth fibonacci number
 
-  def fib(n: Int): Int = ???
+  // Q: Is it possible to make Fib tail recursive when it splits into two branches?
+  def fib(n: Int): Int = {
+    def go(n: Int, acc: Int): Int =
+      if (n == 2 || n == 1) 1
+      else if (n <= 0) 0
+      else go(n-2, acc) + go(n-1, acc)
+    go(n, 0)
+  }
 
   // This definition and `formatAbs` are very similar..
   private def formatFactorial(n: Int) = {
