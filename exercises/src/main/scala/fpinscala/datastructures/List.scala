@@ -166,16 +166,20 @@ object List { // `List` companion object. Contains functions for creating and wo
     Our implementation of foldRight is not tail-recursive and will result in a StackOver- flowError for large lists (we say it’s not stack-safe). Convince yourself that this is the case, and then write another general list-recursion function, foldLeft, that is tail-recursive, using the techniques we discussed in the previous chapter. Here is its signature
 
   For reference:
-    def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
+
+    def foldRight[A,B](as: List[A], acc: B)(f: (A, B) => B): B = // Utility functions
       as match {
-        case Nil => z
+        case Nil => acc
         case Cons(h, t) => f(h, foldRight(t, z)(f))
       }
+
   */
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+
+  // Q: (f: (B, A)) order of args is arbitary right?
+  def foldLeft[A,B](l: List[A], acc: B)(f: (B, A) => B): B = {
     l match {
-      case Nil => z
-      case Cons(h,t) => foldLeft(t, f(z,h))(f)
+      case Nil => acc
+      case Cons(h,t) => foldLeft(t, f(acc,h))(f)
     }
   }
 
@@ -183,14 +187,14 @@ object List { // `List` companion object. Contains functions for creating and wo
   (3.11)
     Implement sum, product, and length using foldLeft
   */
-  def sumLF(l: List[Int]) =
+  def sumFL(l: List[Int]) =
     foldLeft(l, 0)((x,y) => (y + x))
 
-  def productLF(l: List[Int]) =
+  def productFL(l: List[Int]) =
     foldLeft(l, 1)((x,y) => (y * x))
 
-  def lengthLF(l: List[Int]) =
-    foldLeft(l, 0)((x,y) => (y + 1))
+  def lengthFL[A](l: List[A]) =
+    foldLeft(l, 0)((acc,h) => (acc + 1))
 
   /*
   (3.12)
@@ -199,6 +203,57 @@ object List { // `List` companion object. Contains functions for creating and wo
   def reverse[A](l: List[A]): List[A] =
     foldLeft(l, List[A]())((acc,h) => (Cons(h,acc)))
 
+      case Cons(x, xs) =>
+        if (f(x)) dropWhile(xs, f)
+        else Cons(x, dropWhile(xs, f))
+    }
 
-  def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
+  /*
+  (3.14)
+    Implement append
+  */
+
+  // Q: How do you make the resulting list not reversed?
+  def appendFL[A](l: List[A], a: A): List[A] =
+    foldLeft(l, List[A]())(
+      (acc,h) =>
+        if (lengthFL(acc) == (lengthFL(l)-1)) Cons(a, Cons(h, acc))
+        else Cons(h,acc)
+    )
+
+  def appendFR[A](l: List[A], a: A): List[A] =
+    foldRight(l, Cons(a, Nil))(
+      (h, acc) => Cons(h, acc)
+    )
+
+  /*
+  (3.16)
+  */
+  // ERRORING OUT: Scala Int wierdness...
+  def fAdd1(num: Int): Int = num.toInt + 1
+
+  def add1[Int](l: List[Int]): List[Int] =
+    foldLeft(l, List[Int]())((acc, h) => Cons(fAdd1(h), acc))
+
+  /*
+  (3.17)
+  */
+  def listToString(l: List[Double]): List[String] =
+    foldLeft(l, List[String]()) ((acc, h) => Cons(h.toString, acc))
+
+  /*
+  (3.18)
+  */
+  def map[A,B](l: List[A])(f: A => B): List[B] =
+    foldLeft(l, List[B]())((acc, h) => Cons(f(h), acc))
+
+  /*
+  (3.19)
+  */
+  def filter[A](l: List[A])(f: A => Boolean): List[A] =
+    foldLeft(l, List[A]())(
+      (acc, h) =>
+        if (f(h)) Cons(h, acc)
+        else acc
+    )
 }
