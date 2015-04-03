@@ -43,6 +43,7 @@ object List { // `List` companion object. Contains functions for creating and wo
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
     }
 
+
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
 
@@ -138,15 +139,6 @@ object List { // `List` companion object. Contains functions for creating and wo
     might work if you call foldRight with a large list. This is a deeper question that we’ll
     return to in chapter 5.
 
-    def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
-      as match {
-        case Nil => z
-        case Cons(x, xs) => f(x, foldRight(xs, z)(f))
-      }
-
-    def product2(ns: List[Double]) =
-      foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
-
     No because f() is not executed until all inner foldRight() in the recusion steps finish. In other
     words, f() is the last thing that happends on 'case Cons(x, xs) => f(x, foldRight(xs, z)(f))' so
     you end up recursively going through foldRight before f() which prevents short-ciruiting on f()
@@ -173,18 +165,17 @@ object List { // `List` companion object. Contains functions for creating and wo
   (3.10)
     Our implementation of foldRight is not tail-recursive and will result in a StackOver- flowError for large lists (we say it’s not stack-safe). Convince yourself that this is the case, and then write another general list-recursion function, foldLeft, that is tail-recursive, using the techniques we discussed in the previous chapter. Here is its signature
 
+  For reference:
+    def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
+      as match {
+        case Nil => z
+        case Cons(h, t) => f(h, foldRight(t, z)(f))
+      }
   */
   def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
     l match {
       case Nil => z
-      case Cons(x,xs) => foldLeft(xs, f(z,x))(f)
-    }
-  }
-
-  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = {
-    as match {
-      case Nil => z
-      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+      case Cons(h,t) => foldLeft(t, f(z,h))(f)
     }
   }
 
@@ -199,14 +190,14 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldLeft(l, 1)((x,y) => (y * x))
 
   def lengthLF(l: List[Int]) =
-    foldLeft(l, 0)((x,y) => (x + 1))
+    foldLeft(l, 0)((x,y) => (y + 1))
 
   /*
   (3.12)
     Implement reverse
   */
-  def reverse(l: List[A]) =
-    foldLeft(l, List[Nothing])((x,y) => (Cons(x, y)))
+  def reverse[A](l: List[A]): List[A] =
+    foldLeft(l, List[A]())((acc,h) => (Cons(h,acc)))
 
 
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
