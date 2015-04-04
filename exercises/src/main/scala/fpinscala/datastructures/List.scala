@@ -206,6 +206,7 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   /*
   (3.16)
+  NOTE: similar to Flatten
   */
   def concat[A](lofl: List[List[A]]): List[A] =
     foldRight(lofl, List[A]())((x,y) => append(x,y))
@@ -244,6 +245,23 @@ object List { // `List` companion object. Contains functions for creating and wo
   */
   def flatMap[A,B](l: List[A])(f: A => List[B]): List[B] =
     foldLeft(l, List[B]())((acc, h) => concat(List(acc, f(h))))
+
+  /*
+  (3.21)
+  */
+  def filterFM[A](l: List[A])(f: A => Boolean): List[A] =
+    flatMap(l)(
+      i =>
+        if (f(i)) List(i)
+        else List[A]()
+    )
+
+  /*
+  (3.22)
+  */
+  def listSum[A](l1: List[A], l2: List[B]): List[A] =
+    
+
 }
 
 
