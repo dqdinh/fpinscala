@@ -31,12 +31,6 @@ object List { // `List` companion object. Contains functions for creating and wo
     case _ => 101
   }
 
-  def append[A](a1: List[A], a2: List[A]): List[A] =
-    a1 match {
-      case Nil => a2
-      case Cons(h,t) => Cons(h, append(t, a2))
-    }
-
   def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
     as match {
       case Nil => z
@@ -170,7 +164,7 @@ object List { // `List` companion object. Contains functions for creating and wo
     def foldRight[A,B](as: List[A], acc: B)(f: (A, B) => B): B = // Utility functions
       as match {
         case Nil => acc
-        case Cons(h, t) => f(h, foldRight(t, z)(f))
+        case Cons(h, t) => f(h, foldRight(t, acc)(f))
       }
 
   */
@@ -202,38 +196,26 @@ object List { // `List` companion object. Contains functions for creating and wo
   */
   def reverse[A](l: List[A]): List[A] =
     foldLeft(l, List[A]())((acc,h) => (Cons(h,acc)))
-
-      case Cons(x, xs) =>
-        if (f(x)) dropWhile(xs, f)
-        else Cons(x, dropWhile(xs, f))
-    }
-
   /*
   (3.14)
-    Implement append
+    Append 2 lists
   */
 
-  // Q: How do you make the resulting list not reversed?
-  def appendFL[A](l: List[A], a: A): List[A] =
-    foldLeft(l, List[A]())(
-      (acc,h) =>
-        if (lengthFL(acc) == (lengthFL(l)-1)) Cons(a, Cons(h, acc))
-        else Cons(h,acc)
-    )
-
-  def appendFR[A](l: List[A], a: A): List[A] =
-    foldRight(l, Cons(a, Nil))(
-      (h, acc) => Cons(h, acc)
-    )
+  def append[A](l1: List[A], l2: List[A]): List[A] =
+    foldRight(l1, l2)((x,y) => Cons(x,y))
 
   /*
   (3.16)
   */
-  // ERRORING OUT: Scala Int wierdness...
-  def fAdd1(num: Int): Int = num.toInt + 1
+  def concat[A](lofl: List[List[A]]): List[A] =
+    foldRight(lofl, List[A]())((x,y) => append(x,y))
 
-  def add1[Int](l: List[Int]): List[Int] =
-    foldLeft(l, List[Int]())((acc, h) => Cons(fAdd1(h), acc))
+  /*
+  (3.16)
+  */
+
+  def add1(l: List[Int]): List[Int] =
+    foldLeft(l, List[Int]())((acc, h) => Cons((h+1), acc))
 
   /*
   (3.17)
@@ -256,4 +238,49 @@ object List { // `List` companion object. Contains functions for creating and wo
         if (f(h)) Cons(h, acc)
         else acc
     )
+
+  /*
+  (3.20)
+  */
+  def flatMap[A,B](l: List[A])(f: A => List[B]): List[B] =
+    foldLeft(l, List[B]())((acc, h) => concat(List(acc, f(h))))
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
