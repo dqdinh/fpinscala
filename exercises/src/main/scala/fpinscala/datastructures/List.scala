@@ -259,11 +259,38 @@ object List { // `List` companion object. Contains functions for creating and wo
   /*
   (3.22)
   */
-  def listSum[A](l1: List[A], l2: List[B]): List[A] =
-    
+  def listSum(l1: List[Int], l2: List[Int]): List[Int] = {
+    (l1,l2) match {
+      case (_, Nil) => Nil
+      case (Nil, _) => Nil
+      case (Cons(h1,t1), Cons(h2,t2)) => Cons(h1 + h2, listSum(t1,t2))
+    }
+  }
+
+  /*
+  (3.23)
+  */
+  def zipWith[A,B](l1: List[A], l2: List[A])(f: (A,A) => B): List[B] = {
+    (l1,l2) match {
+      case (_, Nil) => Nil
+      case (Nil, _) => Nil
+      case (Cons(h1,t1), Cons(h2,t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
+    }
+  }
+
+  /*
+  (3.24)
+  Wikipedia Definition: a subsequence is a sequence that can be derived from another sequence by deleting some elements without changing the order of the remaining elements. For example, the sequence <A,B,D>  is a subsequence of <A,B,C,D,E,F> . They should not be confused with substring which is <A,B,C,D>  for above string and which is a refinement of subsequence.
+
+  Takeaway: has to be ordered
+
+  Strategy 1: use sup as the source of truth. Go through sub (like foldLeft's mech to leverage short cuircitihg). A you go through sub, redefine the sup sequence after you've found it from sub. that way you can track order.
+  */
+
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+  }
 
 }
-
 
 
 
